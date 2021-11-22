@@ -4,10 +4,9 @@ from time import time, sleep
 import json
 from random import choice
 
-from _curses import ERR
-
 
 def init():
+    """Initiates the color pairs needed"""
     curses.init_pair(1, 2, 0)  # Green
     curses.init_pair(2, 4, 0)  # Red
     curses.init_pair(3, 7, 0)  # White
@@ -19,6 +18,7 @@ def init():
 
 
 def settings(stdscr):
+    """Shows the current options and allows user to change, writes to typing.json"""
     with open('typing.json') as myfile:
         options = json.load(myfile)
 
@@ -102,6 +102,7 @@ def settings(stdscr):
 
 
 def start(stdscr):
+    """Shows the start screen with options to begin or change settings"""
     stdscr.clear()
     stdscr.addstr('Press enter to begin')
     stdscr.addstr('\nPress s to change settings')
@@ -110,7 +111,7 @@ def start(stdscr):
         key = stdscr.getch()
         if key in {curses.KEY_ENTER, 10, 13}:
             break
-        elif key == 115:
+        if key == 115:
             stdscr.clear()
             settings(stdscr)
             stdscr.clear()
@@ -121,7 +122,8 @@ def start(stdscr):
 
 
 def wpm(stdscr):
-    # Show text
+    """Begin the typing game"""
+
     stdscr.refresh()
     # Set variables
     i = 0
@@ -143,14 +145,14 @@ def wpm(stdscr):
     length = len(text)
     stdscr.addstr(text)
 
-    for x in range(length):
+    for _ in range(length):
         letter_list.append(3)
     correct = 0
     overall_start = time()
     while i < length:
         key = stdscr.getkey()
         height, width = stdscr.getmaxyx()
-        stdscr.addstr(6, 0, str(width))
+        stdscr.addstr(6, 0, f'x - {str(width)}, y - {str(height)}')
         stdscr.addstr(7, 0, '                          ')
         if str(key) == 'KEY_RESIZE':
             stdscr.addstr(7, 0, 'Resizing may cause crashes', curses.A_BOLD | curses.color_pair(2))
@@ -188,7 +190,7 @@ def wpm(stdscr):
         i += 1
         current_wrong = letter_list.count(1)
         if show_mistakes == 1:
-            for f in range(len(letter_list)):
+            for f in enumerate(letter_list):
                 if length <= width:
                     stdscr.addstr(5, 0, "                                ")
                     if letter_list[f] == 1:
@@ -229,6 +231,7 @@ def wpm(stdscr):
 
 
 def main(stdscr):
+    """Main function, calls all other functions"""
     init()
     while True:
         start(stdscr)
